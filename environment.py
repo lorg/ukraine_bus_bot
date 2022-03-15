@@ -9,7 +9,8 @@ class Environment:
         self.ENV_NAME = os.environ.get('ENV_NAME')
 
         self.TEXTS_TABLE = os.environ.get('TEXTS_TABLE', "texts_table_test")
-        self.BLASTS_TABLE = os.environ.get('BLASTS_TABLE', "tags_table_test")
+        self.BLASTS_TABLE = os.environ.get('BLASTS_TABLE', "blasts_table_test")
+        self.BLAST_PHONES_TABLE = os.environ.get('BLAST_PHONES_TABLE', 'blast_phones_table_test')
 
         self.SOURCE_NUMBER = os.environ.get('SOURCE_NUMBER', '').strip()
         self.TEST_NUMBERS = os.environ.get('TEST_NUMBERS', '').strip()

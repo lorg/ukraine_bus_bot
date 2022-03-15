@@ -29,3 +29,23 @@ else:
 class MessagingMethod(Enum):
     WHATSAPP = 'whatsapp'
     SMS = 'sms'
+
+
+class BlastStatus(Enum):
+    IN_PROGRESS = 'in progress'
+    ERROR = 'error'
+    DONE = 'done'
+
+
+class Blast(BaseModel):
+    blast_id: str
+    status: BlastStatus
+    started_timestamp: str
+    ended_timestamp: str
+    num_phones: str
+    last_phone_sent: str
+
+class BlastPhone(BaseModel):
+    blast_id: str
+    phone: str
+    phone_idx: str

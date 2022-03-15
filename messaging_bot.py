@@ -76,6 +76,9 @@ class Bot:
         self.env = environment
         self.table_class = table_class
 
+        self.blasts_table: db.DynamoDBModelTable = model_table_class(self.env.BLASTS_TABLE, models.Blast, "blast_id", "status")
+        self.blast_phones_table: db.DynamoDBModelTable = model_table_class(self.env.BLAST_PHONES_TABLE, models.BlastPhone, "blast_id", "phone")
+
         self.whatsapp_messaging_session: messaging.WassengerSession = whatsapp_messaging_session
         # self.sms_messaging_session: messaging.MessagingSession = sms_messaging_session
         self.google_sheets = google_sheets.GoogleSheets(self.env)
@@ -87,7 +90,8 @@ class Bot:
         # self.sms_messaging_session.flush_messages()
 
     def handle_blast_request(self):
-        number = self.env.TEST_NUMBERS.split(',')[0]
+        numbers = self.env.TEST_NUMBERS.split(',')
+        number = numbers[0]
         self.whatsapp_messaging_session.send_message(number, "hello world")
         self.google_sheets.report_log(self.env.SOURCE_NUMBER, number, "hello world", "blast", "having a blast")
         self.call_timeout_with_params(dict(

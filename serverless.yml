@@ -68,6 +68,7 @@ provider:
     GOOGLE_SHEETS_LOG_URL: ${param:GOOGLE_SHEETS_LOG_URL, ''}
     BLASTS_TABLE: ${self:custom.blastsTableName}
     BLAST_PHONES_TABLE: ${self:custom.blastPhonesTableName}
+    TIMEOUT_STEP_FUNC_ARN: !Sub 'arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${self:custom.stepFunctionName}'
 
 
 functions:
