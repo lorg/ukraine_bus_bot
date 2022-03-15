@@ -52,7 +52,9 @@ provider:
     WASSENGER_API_KEY: ${param:WASSENGER_API_KEY, ''}
     SOURCE_NUMBER: ${param:SOURCE_NUMBER, ''}
     SOURCE_DEVICE: ${param:SOURCE_DEVICE, ''}
+    TEST_NUMBER: ${param:TEST_NUMBER, ''}
     BLASTS_TABLE: ${self:custom.blastsTableName}
+
 
 functions:
   api:
