@@ -90,10 +90,23 @@ class Bot:
         # self.sms_messaging_session.flush_messages()
 
     def handle_blast_request(self):
-        numbers = self.env.TEST_NUMBERS.split(',')
-        number = numbers[0]
-        self.whatsapp_messaging_session.send_message(number, "hello world")
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, number, "hello world", "blast", "having a blast")
+        phones = self.env.TEST_NUMBERS.split(',')
+        blast = models.Blast(
+            blast_id=utils.get_uid(),
+            status=models.BlastStatus.IN_PROGRESS,
+            num_phones=str(len(phones)),
+            last_phone_sent=0,
+            started_timestamp=datetime.datetime.utcnow().isoformat(),
+            ended_timestamp="")
+        self.blasts_table.put(blast)
+        with self.blast_phones_table.batch_writer() as batch:
+            for i, phone in enumerate(phones):
+                batch.put(models.BlastPhone(
+                    blast_id=blast.blast_id,
+                    phone=phone,
+                    phone_idx=str(i)))
+        self.whatsapp_messaging_session.send_message(phones[0], "hello world")
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phones[0], "hello world", "blast", "having a blast")
         self.call_timeout_with_params(dict(
             blast_id='BLAST_TEST_ID',
             method=defs.TimeoutMethod.ITERATE_BLAST,

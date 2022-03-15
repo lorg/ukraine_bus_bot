@@ -8,3 +8,4 @@ Flask-Cors==3.0.10
 pydantic==1.8.2
 requests-toolbelt==0.9.1
 twilio==7.7.1
+rook==0.1.165

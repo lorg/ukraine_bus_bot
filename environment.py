@@ -18,8 +18,8 @@ class Environment:
             'SMS_SOURCE_NUMBERS', '').strip()
 
         self.WEBHOOK_TOKEN = os.environ.get('WEBHOOK_TOKEN', '').strip()
-        # self.ROOKOUT_TOKEN = os.environ.get('ROOKOUT_TOKEN', '').strip()
-        # self.RUN_ROOKOUT = int(os.environ.get('RUN_ROOKOUT', '0').strip())
+        self.ROOKOUT_TOKEN = os.environ.get('ROOKOUT_TOKEN', '').strip()
+        self.RUN_ROOKOUT = int(os.environ.get('RUN_ROOKOUT', '0').strip())
         self.TIMEOUT_STEP_FUNC_ARN = os.environ.get(
             'TIMEOUT_STEP_FUNC_ARN', '').strip()
 

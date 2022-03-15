@@ -2,6 +2,9 @@ import requests
 
 import environment
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 class GoogleSheets:
     def __init__(self, env: environment.Environment):
@@ -21,4 +24,5 @@ class GoogleSheets:
         }
 
         url = self.env.GOOGLE_SHEETS_LOG_URL
-        requests.post(url, data=form_data)
+        response = requests.post(url, data=form_data)
+        logger.info(f"Google sheets log response: {response.status_code}")

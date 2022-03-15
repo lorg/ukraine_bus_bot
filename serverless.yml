@@ -60,14 +60,19 @@ provider:
             - !Sub 'arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${self:custom.stepFunctionName}'
   environment:
     ENV_NAME: ${self:custom.myStage}
+
     WEBHOOK_TOKEN: ${param:WEBHOOK_TOKEN, ''}
     WASSENGER_API_KEY: ${param:WASSENGER_API_KEY, ''}
     SOURCE_NUMBER: ${param:SOURCE_NUMBER, ''}
     SOURCE_DEVICE: ${param:SOURCE_DEVICE, ''}
     TEST_NUMBERS: ${param:TEST_NUMBERS, ''}
     GOOGLE_SHEETS_LOG_URL: ${param:GOOGLE_SHEETS_LOG_URL, ''}
+    ROOKOUT_TOKEN: ${param:ROOKOUT_TOKEN, ''}
+    RUN_ROOKOUT: ${param:RUN_ROOKOUT, ''}
+
     BLASTS_TABLE: ${self:custom.blastsTableName}
     BLAST_PHONES_TABLE: ${self:custom.blastPhonesTableName}
+
     TIMEOUT_STEP_FUNC_ARN: !Sub 'arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${self:custom.stepFunctionName}'
 
 

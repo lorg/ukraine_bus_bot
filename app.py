@@ -30,6 +30,7 @@ def hello_world() -> Response:
 @catch_exceptions_flask
 def blast(webhook_token):
     env = get_env()
+    start_rookout(env)
     if webhook_token != env.WEBHOOK_TOKEN:
         print(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
         return jsonify({"error": "incorrect token"})
@@ -41,8 +42,8 @@ def blast(webhook_token):
 @app.route('/timeout/<string:timeout_params>', methods=['POST'])
 @catch_exceptions_flask
 def timeout(timeout_params) -> Response:
-
     env = get_env()
+    start_rookout(env)
     data: dict = deserialize(timeout_params)
     if data.get('remaining_timeout_seconds'):
         remaining_timeout_seconds = data['remaining_timeout_seconds']
