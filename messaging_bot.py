@@ -92,7 +92,6 @@ class Bot:
         # self.sms_messaging_session.flush_messages()
 
     def handle_blast_request(self):
-        # phones = self.env.TEST_NUMBERS.split(',')
         phones = [line[0] for line in self.google_sheets.read_sheet()]
         text_to_send = phones[0]
         phones = phones[1:]
@@ -111,8 +110,8 @@ class Bot:
                     blast_id=blast.blast_id,
                     phone=phone,
                     phone_idx=str(i)))
-        self.whatsapp_messaging_session.send_message(phones[0], "hello world")
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phones[0], "hello world", "blast", "having a blast")
+        self.whatsapp_messaging_session.send_message(utils.clean_phone(phones[0]), blast.text_to_send)
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phones[0], blast.text_to_send, "text_sent", f"Text was sent to 'utils.clean_phone(phone)', {blast.blast_id}")
         self.call_timeout_with_params(dict(
             blast_id='BLAST_TEST_ID',
             method=defs.TimeoutMethod.ITERATE_BLAST,
@@ -134,8 +133,8 @@ class Bot:
             self.blasts_table.put(blast)
             return
 
-        self.whatsapp_messaging_session.send_message(phone, blast.text_to_send)
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "xxx", f"having a blast iteration {blast_id}")
+        self.whatsapp_messaging_session.send_message(utils.clean_phone(phone), blast.text_to_send)
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "text_sent", f"Text was sent to 'utils.clean_phone(phone)', {blast_id}")
 
         blast.last_phone_sent_idx = str(next_idx_to_send)
         self.blasts_table.put(blast)

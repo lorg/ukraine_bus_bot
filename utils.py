@@ -434,8 +434,9 @@ def clean_phone(phone):
         return '+972' + phone[1:]
     if phone.startswith('5'):
         return '+972' + phone
-    if phone.startswith('972'):
+    if not phone.startswith('+'):
         return '+' + phone
+
     return phone
 
 
