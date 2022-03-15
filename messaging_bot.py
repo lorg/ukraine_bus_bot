@@ -91,6 +91,16 @@ class Bot:
         self.whatsapp_messaging_session.flush_messages()
         # self.sms_messaging_session.flush_messages()
 
+    def handle_single_blast_message(self, blast_id: str, phone: str, text_to_send: str):
+        # ? Better switch to `phonenumbers` library
+        e164_phone = utils.clean_phone(phone)
+        if not self.whatsapp_messaging_session.is_phone_number_exists(e164_phone):
+          self.google_sheets.report_log(self.env.SOURCE_NUMBER, e164_phone, text_to_send, "not_a_whatsapp_phone", f"'{e164_phone} is not a whatsapp phone number', {blast_id}")
+          return
+
+        self.whatsapp_messaging_session.send_message(utils.clean_phone(phone), text_to_send)
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, e164_phone, text_to_send, "text_sent", f"Text 0 was sent to '{e164_phone}', {blast_id}")
+
     def handle_blast_request(self):
         phones = [line[0] for line in self.google_sheets.read_sheet()]
         text_to_send = phones[0]
@@ -111,8 +121,9 @@ class Bot:
                     phone=phone,
                     phone_idx=str(i)))
         phone = phones[0]
-        self.whatsapp_messaging_session.send_message(utils.clean_phone(phone), blast.text_to_send)
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "text_sent", f"Text 0 was sent to '{utils.clean_phone(phone)}', {blast.blast_id}")
+
+        self.handle_single_blast_message(blast.blast_id, phone, blast.text_to_send)
+
         self.call_timeout_with_params(dict(
             blast_id=blast.blast_id,
             method=defs.TimeoutMethod.ITERATE_BLAST,
@@ -134,8 +145,7 @@ class Bot:
             self.blasts_table.put(blast)
             return
 
-        self.whatsapp_messaging_session.send_message(utils.clean_phone(phone), blast.text_to_send)
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "text_sent", f"Text {next_idx_to_send} was sent to '{utils.clean_phone(phone)}', {blast_id}")
+        self.handle_single_blast_message(blast_id, phone, blast.text_to_send)
 
         blast.last_phone_sent_idx = str(next_idx_to_send)
         self.blasts_table.put(blast)
