@@ -50,14 +50,15 @@ SESSION_TOKEN_TTL = 7 * 24 * 60 * 60
 @contextmanager
 def start_bot(
         whatsapp_messaging_session: Optional[messaging.WassengerSession] = None,
-        sms_messaging_session: Optional[messaging.MessagingSession] = None) -> "Bot":
+        #sms_messaging_session: Optional[messaging.MessagingSession] = None
+) -> "Bot":
 
     if whatsapp_messaging_session is None:
         whatsapp_messaging_session = messaging.WassengerSession()
-    if sms_messaging_session is None:
-        sms_messaging_session = messaging.TwilioSession()
+    # if sms_messaging_session is None:
+    #     sms_messaging_session = messaging.TwilioSession()
 
-    bot = Bot(whatsapp_messaging_session, sms_messaging_session)
+    bot = Bot(whatsapp_messaging_session)  # , sms_messaging_session)
     try:
         yield bot
     finally:
@@ -68,7 +69,7 @@ class Bot:
     def __init__(
             self,
             whatsapp_messaging_session: messaging.WassengerSession,
-            sms_messaging_session: messaging.MessagingSession,
+            # sms_messaging_session: messaging.MessagingSession,
             table_class=db.DynamoDBTable,
             model_table_class=db.DynamoDBModelTable,
             environment: Environment = Environment()):
@@ -76,18 +77,22 @@ class Bot:
         self.table_class = table_class
 
         self.whatsapp_messaging_session: messaging.WassengerSession = whatsapp_messaging_session
-        self.sms_messaging_session: messaging.MessagingSession = sms_messaging_session
+        # self.sms_messaging_session: messaging.MessagingSession = sms_messaging_session
         self.google_sheets = google_sheets.GoogleSheets(self.env)
 
         self.global_feature_flags = GlobalFeatureFlags()
 
     def flush_messages(self):
         self.whatsapp_messaging_session.flush_messages()
-        self.sms_messaging_session.flush_messages()
+        # self.sms_messaging_session.flush_messages()
 
     def handle_blast_request(self):
         self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "hello world")
         self.google_sheets.report_log(self.env.SOURCE_NUMBER, self.env.TEST_NUMBER, "hello world", "blast", "having a blast")
+
+    def iterate_blast(self, blast_id):
+        self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "iterate blast")
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, self.env.TEST_NUMBER, "iterate blast", "xxx", "having a blast iteration")
 
     # def _load_global_feature_flags(self):
     #     persistents_data = self.persistents_table.get_first(name=GLOBAL_FEATURE_FLAGS_PERSISTENT_NAME)

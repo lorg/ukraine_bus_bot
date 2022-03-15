@@ -125,12 +125,16 @@ class TestingBot(messaging_bot.Bot):
             self,
             flask_client: FlaskClient,
             whatsapp_messaging_session: messaging.WassengerSession,
-            sms_messaging_session: messaging.MessagingSession,
+            # sms_messaging_session: messaging.MessagingSession,
             table_class,
             model_table_class,
             environment: Environment):
-        super().__init__(whatsapp_messaging_session, sms_messaging_session,
-                         table_class=table_class, model_table_class=model_table_class, environment=environment)
+        super().__init__(
+            whatsapp_messaging_session,
+            # sms_messaging_session,
+            table_class=table_class,
+            model_table_class=model_table_class,
+            environment=environment)
         self.pending_timeouts: List[TimeoutCall] = []
         self.immediate_timeouts = True
         self.flask_client = flask_client
@@ -193,7 +197,7 @@ class TestingBot(messaging_bot.Bot):
 
     def clear_sent_messages(self):
         self.whatsapp_messaging_session.clear_sent_messages()
-        self.sms_messaging_session.clear_sent_messages()
+        # self.sms_messaging_session.clear_sent_messages()
 
 
 @ pytest.fixture
@@ -226,12 +230,12 @@ def create_testing_bot(flask_client, bot_class=TestingBot, admin_numbers=None, t
 
     whatsapp_messaging_session = messaging.MockWassengerSession(
         queue_messages=False, environment=env)
-    sms_messaging_session = whatsapp_messaging_session
+    # sms_messaging_session = whatsapp_messaging_session
 
     app_bot = bot_class(
         flask_client,
         whatsapp_messaging_session,
-        sms_messaging_session,
+        # sms_messaging_session,
         db.MockDynamoDBTable,
         db.MockDynamoDBModelTable,
         env)
