@@ -81,6 +81,10 @@ class Bot:
 
         self.global_feature_flags = GlobalFeatureFlags()
 
+    def flush_messages(self):
+        self.whatsapp_messaging_session.flush_messages()
+        self.sms_messaging_session.flush_messages()
+
     def handle_blast_request(self):
         self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "hello world")
         self.google_sheets.report_log(self.env.SOURCE_NUMBER, self.env.TEST_NUMBER, "hello world", "blast", "having a blast")

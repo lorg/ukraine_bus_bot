@@ -8,7 +8,7 @@ custom:
   myStage: ${opt:stage, self:provider.stage}
   blastsTableName: 'ukraine-bus-bot-blasts-${self:custom.myStage}'
   blastPhonesTableName: 'ukraine-bus-bot-blast-phones-${self:custom.myStage}'
-  stepFunctionName: ukraine-bus-bot-callWithDelay-${self:custom.myStage}
+  stepFunctionName: ukraineBusBotCallWithDelay-${self:custom.myStage}
   wsgi:
     app: app.app
 
@@ -78,35 +78,35 @@ functions:
     events:
       - httpApi: '*'
 
-# stepFunctions:
-#   stateMachines:
-#     callWithDelay:
-#       name: ${self:custom.stepFunctionName}
-#       definition:
-#         Comment: "A step function that calls our lambda with delay"
-#         StartAt: waitState
-#         States:
-#           waitState:
-#             Type: Wait
-#             SecondsPath: $.WAIT_TIME
-#             Next: callLambda
-#           callLambda:
-#             Type: Task
-#             Resource:
-#               Fn::GetAtt: [api, Arn]
-#             InputPath: $
-#             End: true
+stepFunctions:
+  stateMachines:
+    callWithDelay:
+      name: ${self:custom.stepFunctionName}
+      definition:
+        Comment: "A step function that calls our lambda with delay"
+        StartAt: waitState
+        States:
+          waitState:
+            Type: Wait
+            SecondsPath: $.WAIT_TIME
+            Next: callLambda
+          callLambda:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [api, Arn]
+            InputPath: $
+            End: true
 
 plugins:
   - serverless-wsgi
   - serverless-python-requirements
   - serverless-step-functions
 resources:
-  # Outputs:
-  #   CallWithDelay:
-  #     Description: The ARN of this step function
-  #     Value:
-  #       Ref: CallWithDelayDash${self:custom.myStage}
+  Outputs:
+    CallWithDelay:
+      Description: The ARN of this step function
+      Value:
+        Ref: UkraineBusBotCallWithDelayDash${self:custom.myStage}
   Resources:
     BlastsTable:
       Type: AWS::DynamoDB::Table
