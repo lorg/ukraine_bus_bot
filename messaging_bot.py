@@ -49,7 +49,7 @@ SESSION_TOKEN_TTL = 7 * 24 * 60 * 60
 @contextmanager
 def start_bot(
         whatsapp_messaging_session: Optional[messaging.WassengerSession] = None,
-        sms_messaging_session: Optional[messaging.MessagingSession] = None):
+        sms_messaging_session: Optional[messaging.MessagingSession] = None) -> "Bot":
 
     if whatsapp_messaging_session is None:
         whatsapp_messaging_session = messaging.WassengerSession()
@@ -79,7 +79,7 @@ class Bot:
 
         self.global_feature_flags = GlobalFeatureFlags()
 
-    def handle_blast(self):
+    def handle_blast_request(self):
         self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "hello world")
 
     # def _load_global_feature_flags(self):

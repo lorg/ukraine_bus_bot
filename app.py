@@ -22,7 +22,7 @@ def hello_world() -> Response:
     return jsonify({'message': 'hello world!'})
 
 
-@app.route('/blast/')
+@app.route('/blast/<string:webhook_token>')
 def blast(webhook_token):
     env = get_env()
     if webhook_token != env.WEBHOOK_TOKEN:
