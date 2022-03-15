@@ -110,8 +110,9 @@ class Bot:
                     blast_id=blast.blast_id,
                     phone=phone,
                     phone_idx=str(i)))
-        self.whatsapp_messaging_session.send_message(utils.clean_phone(phones[0]), blast.text_to_send)
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phones[0], blast.text_to_send, "text_sent", f"Text 0 was sent to '{utils.clean_phone(phone)}', {blast.blast_id}")
+        phone = phones[0]
+        self.whatsapp_messaging_session.send_message(utils.clean_phone(phone), blast.text_to_send)
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "text_sent", f"Text 0 was sent to '{utils.clean_phone(phone)}', {blast.blast_id}")
         self.call_timeout_with_params(dict(
             blast_id=blast.blast_id,
             method=defs.TimeoutMethod.ITERATE_BLAST,

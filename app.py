@@ -26,7 +26,7 @@ def hello_world() -> Response:
     return jsonify({'message': 'hello world!'})
 
 
-@app.route('/blast/<string:webhook_token>')
+@app.route('/blast/<string:webhook_token>', methods=['GET', 'POST'])
 @catch_exceptions_flask
 def blast(webhook_token):
     env = get_env()
