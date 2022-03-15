@@ -87,12 +87,18 @@ class Bot:
         # self.sms_messaging_session.flush_messages()
 
     def handle_blast_request(self):
-        self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "hello world")
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, self.env.TEST_NUMBER, "hello world", "blast", "having a blast")
+        number = self.env.TEST_NUMBERS.split(',')[0]
+        self.whatsapp_messaging_session.send_message(number, "hello world")
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, number, "hello world", "blast", "having a blast")
+        self.call_timeout_with_params(dict(
+            blast_id='BLAST_TEST_ID',
+            method=defs.TimeoutMethod.ITERATE_BLAST,
+        ), 10)
 
     def iterate_blast(self, blast_id):
-        self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "iterate blast")
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, self.env.TEST_NUMBER, "iterate blast", "xxx", "having a blast iteration")
+        number = self.env.TEST_NUMBERS.split(',')[0]
+        self.whatsapp_messaging_session.send_message(number, "iterate blast")
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, number, "iterate blast", "xxx", f"having a blast iteration {blast_id}")
 
     # def _load_global_feature_flags(self):
     #     persistents_data = self.persistents_table.get_first(name=GLOBAL_FEATURE_FLAGS_PERSISTENT_NAME)

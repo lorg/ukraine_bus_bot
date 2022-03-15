@@ -64,7 +64,7 @@ provider:
     WASSENGER_API_KEY: ${param:WASSENGER_API_KEY, ''}
     SOURCE_NUMBER: ${param:SOURCE_NUMBER, ''}
     SOURCE_DEVICE: ${param:SOURCE_DEVICE, ''}
-    TEST_NUMBER: ${param:TEST_NUMBER, ''}
+    TEST_NUMBERS: ${param:TEST_NUMBERS, ''}
     GOOGLE_SHEETS_LOG_URL: ${param:GOOGLE_SHEETS_LOG_URL, ''}
     BLASTS_TABLE: ${self:custom.blastsTableName}
     BLAST_PHONES_TABLE: ${self:custom.blastPhonesTableName}

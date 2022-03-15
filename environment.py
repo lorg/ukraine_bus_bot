@@ -12,7 +12,7 @@ class Environment:
         self.BLASTS_TABLE = os.environ.get('BLASTS_TABLE', "tags_table_test")
 
         self.SOURCE_NUMBER = os.environ.get('SOURCE_NUMBER', '').strip()
-        self.TEST_NUMBER = os.environ.get('TEST_NUMBER', '').strip()
+        self.TEST_NUMBERS = os.environ.get('TEST_NUMBERS', '').strip()
         self.SMS_SOURCE_NUMBERS = os.environ.get(
             'SMS_SOURCE_NUMBERS', '').strip()
 

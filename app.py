@@ -35,6 +35,7 @@ def blast(webhook_token):
         return jsonify({"error": "incorrect token"})
     with start_bot() as bot:
         bot.handle_blast_request()
+    return jsonify({})
 
 
 @app.route('/timeout/<string:timeout_params>', methods=['POST'])
