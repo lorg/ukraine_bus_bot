@@ -95,7 +95,7 @@ class Bot:
             blast_id=utils.get_uid(),
             status=models.BlastStatus.IN_PROGRESS,
             num_phones=str(len(phones)),
-            last_phone_sent=0,
+            last_phone_sent_idx=0,
             started_timestamp=datetime.datetime.utcnow().isoformat(),
             ended_timestamp="")
         self.blasts_table.put(blast)
@@ -113,9 +113,31 @@ class Bot:
         ), 10)
 
     def iterate_blast(self, blast_id):
-        number = self.env.TEST_NUMBERS.split(',')[0]
-        self.whatsapp_messaging_session.send_message(number, "iterate blast")
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, number, "iterate blast", "xxx", f"having a blast iteration {blast_id}")
+        blast = self.blasts_table.get_first(blast_id=blast_id)
+        if blast is None:
+            logger.log("no such blast %s", blast_id)
+            return
+        next_idx_to_send = int(blast.last_phone_sent_idx) + 1
+        phones = self.blast_phones_table.query(blast_id=blast_id)
+        idx_to_phone = {phone.phone_idx: phone.phone for phone in phones}
+        phone = idx_to_phone.get(next_idx_to_send)
+        if not phone:
+            logger.log("no more phones to send to: %s", blast_id)
+            blast.status = models.BlastStatus.DONE
+            blast.ended_timestamp = datetime.datetime.utcnow().isoformat()
+            self.blasts_table.put(blast)
+            return
+
+        self.whatsapp_messaging_session.send_message(phone, "iterate blast")
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, "iterate blast", "xxx", f"having a blast iteration {blast_id}")
+
+        blast.last_phone_sent_idx = str(next_idx_to_send)
+        self.blasts_table.put(blast)
+
+        self.call_timeout_with_params(dict(
+            blast_id='BLAST_TEST_ID',
+            method=defs.TimeoutMethod.ITERATE_BLAST,
+        ), 10)
 
     # def _load_global_feature_flags(self):
     #     persistents_data = self.persistents_table.get_first(name=GLOBAL_FEATURE_FLAGS_PERSISTENT_NAME)

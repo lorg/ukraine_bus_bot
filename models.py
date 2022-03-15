@@ -43,7 +43,8 @@ class Blast(BaseModel):
     started_timestamp: str
     ended_timestamp: str
     num_phones: str
-    last_phone_sent: str
+    last_phone_sent_idx: str
+
 
 class BlastPhone(BaseModel):
     blast_id: str
