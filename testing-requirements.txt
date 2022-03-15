@@ -1,0 +1,7 @@
+pytest==6.2.4
+pytest-dynamodb==2.1.0
+mypy-boto3==1.18.4
+mypy
+pylint
+types-requests==2.26.0
+ipython

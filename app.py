@@ -1,54 +1,35 @@
-import os
+import logging
 
-import boto3
-from flask import Flask, jsonify, make_response, request
+from flask import jsonify, Flask, make_response, request, Response, redirect  # type: ignore
+
+from environment import Environment
+from messaging_bot import start_bot
 
 app = Flask(__name__)
+_env = Environment()
 
 
-dynamodb_client = boto3.client('dynamodb')
-
-if os.environ.get('IS_OFFLINE'):
-    dynamodb_client = boto3.client(
-        'dynamodb', region_name='localhost', endpoint_url='http://localhost:8000'
-    )
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
-# USERS_TABLE = os.environ['USERS_TABLE']
-
-@app.route('/hello')
-def hello_world():
-    return jsonify({'hello': 'world'})
+def get_env():
+    return _env
 
 
-# @app.route('/users/<string:user_id>')
-# def get_user(user_id):
-#     pass
-    # result = dynamodb_client.get_item(
-    #     TableName=USERS_TABLE, Key={'userId': {'S': user_id}}
-    # )
-    # item = result.get('Item')
-    # if not item:
-    #     return jsonify({'error': 'Could not find user with provided "userId"'}), 404
-
-    # return jsonify(
-    #     {'userId': item.get('userId').get('S'), 'name': item.get('name').get('S')}
-    # )
+@app.route('/')
+def hello_world() -> Response:
+    return jsonify({'message': 'hello world!'})
 
 
-# @app.route('/users', methods=['POST'])
-# def create_user():
-#     pass
-    # user_id = request.json.get('userId')
-    # name = request.json.get('name')
-    # if not user_id or not name:
-    #     return jsonify({'error': 'Please provide both "userId" and "name"'}), 400
-
-    # dynamodb_client.put_item(
-    #     TableName=USERS_TABLE, Item={'userId': {'S': user_id}, 'name': {'S': name}}
-    # )
-
-    # return jsonify({'userId': user_id, 'name': name})
+@app.route('/blast/')
+def blast(webhook_token):
+    env = get_env()
+    if webhook_token != env.WEBHOOK_TOKEN:
+        print(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
+        return jsonify({"error": "incorrect token"})
+    with start_bot() as bot:
+        bot.handle_blast_request()
 
 
 @app.errorhandler(404)

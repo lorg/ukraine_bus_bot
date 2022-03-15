@@ -1,5 +1,10 @@
 Flask==1.1.4
 Werkzeug==1.0.1
 markupsafe==2.0.1
-
-
+aiohttp==3.8.1
+requests==2.25.1
+types-Flask==1.1.1
+Flask-Cors==3.0.10
+pydantic==1.8.2
+requests-toolbelt==0.9.1
+twilio==7.7.1
