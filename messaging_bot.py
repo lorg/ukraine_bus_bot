@@ -46,6 +46,8 @@ APP_CODE_TTL = 5 * 60
 AUTO_TOKEN_TTL = 7 * 24 * 60 * 60
 SESSION_TOKEN_TTL = 7 * 24 * 60 * 60
 
+LOOP_ITERATION_DELAY = 1
+
 
 @contextmanager
 def start_bot(
@@ -90,14 +92,18 @@ class Bot:
         # self.sms_messaging_session.flush_messages()
 
     def handle_blast_request(self):
-        phones = self.env.TEST_NUMBERS.split(',')
+        # phones = self.env.TEST_NUMBERS.split(',')
+        phones = [line[0] for line in self.google_sheets.read_sheet()]
+        text_to_send = phones[0]
+        phones = phones[1:]
         blast = models.Blast(
             blast_id=utils.get_uid(),
             status=models.BlastStatus.IN_PROGRESS,
             num_phones=str(len(phones)),
             last_phone_sent_idx=0,
             started_timestamp=datetime.datetime.utcnow().isoformat(),
-            ended_timestamp="")
+            ended_timestamp="",
+            text_to_send=text_to_send)
         self.blasts_table.put(blast)
         with self.blast_phones_table.batch_writer() as batch:
             for i, phone in enumerate(phones):
@@ -110,7 +116,7 @@ class Bot:
         self.call_timeout_with_params(dict(
             blast_id='BLAST_TEST_ID',
             method=defs.TimeoutMethod.ITERATE_BLAST,
-        ), 10)
+        ), LOOP_ITERATION_DELAY)
 
     def iterate_blast(self, blast_id):
         blast = self.blasts_table.get_first(blast_id=blast_id)
@@ -128,8 +134,8 @@ class Bot:
             self.blasts_table.put(blast)
             return
 
-        self.whatsapp_messaging_session.send_message(phone, "iterate blast")
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, "iterate blast", "xxx", f"having a blast iteration {blast_id}")
+        self.whatsapp_messaging_session.send_message(phone, blast.text_to_send)
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "xxx", f"having a blast iteration {blast_id}")
 
         blast.last_phone_sent_idx = str(next_idx_to_send)
         self.blasts_table.put(blast)
@@ -137,7 +143,7 @@ class Bot:
         self.call_timeout_with_params(dict(
             blast_id='BLAST_TEST_ID',
             method=defs.TimeoutMethod.ITERATE_BLAST,
-        ), 10)
+        ), LOOP_ITERATION_DELAY)
 
     # def _load_global_feature_flags(self):
     #     persistents_data = self.persistents_table.get_first(name=GLOBAL_FEATURE_FLAGS_PERSISTENT_NAME)

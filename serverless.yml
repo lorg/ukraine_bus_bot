@@ -69,6 +69,10 @@ provider:
     GOOGLE_SHEETS_LOG_URL: ${param:GOOGLE_SHEETS_LOG_URL, ''}
     ROOKOUT_TOKEN: ${param:ROOKOUT_TOKEN, ''}
     RUN_ROOKOUT: ${param:RUN_ROOKOUT, ''}
+    GOOGLE_SHEET_ID: ${param:GOOGLE_SHEET_ID, ''}
+    GOOGLE_SHEET_RANGE: ${param:GOOGLE_SHEET_RANGE, ''}
+    GOOGLE_SHEET_CREDENTIALS: ${param:GOOGLE_SHEET_CREDENTIALS}
+
 
     BLASTS_TABLE: ${self:custom.blastsTableName}
     BLAST_PHONES_TABLE: ${self:custom.blastPhonesTableName}

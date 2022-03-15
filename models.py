@@ -44,6 +44,7 @@ class Blast(BaseModel):
     ended_timestamp: str
     num_phones: str
     last_phone_sent_idx: str
+    text_to_send: str
 
 
 class BlastPhone(BaseModel):

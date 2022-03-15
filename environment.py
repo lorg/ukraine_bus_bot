@@ -38,6 +38,9 @@ class Environment:
             'ADMIN_MESSAGES_SOURCE_DEVICE', '')
 
         self.GOOGLE_SHEETS_LOG_URL = os.environ.get('GOOGLE_SHEETS_LOG_URL', '')
+        self.GOOGLE_SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
+        self.GOOGLE_SHEET_RANGE = os.environ.get('GOOGLE_SHEET_RANGE', '')
+        self.GOOGLE_SHEET_CREDENTIALS = os.environ.get('GOOGLE_SHEET_CREDENTIALS', '')
 
         # self.SENTRY_DSN = os.environ.get('SENTRY_DSN', '').strip()
 
