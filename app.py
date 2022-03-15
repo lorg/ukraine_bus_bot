@@ -75,7 +75,7 @@ def timeout(timeout_params) -> Response:
 def whatsapp_response(webhook_token) -> Response:
     env = get_env()
     start_rookout(env)
-    if webhook_token != env.WASSENGER_WEBHOOK_TOKEN:
+    if webhook_token != env.WEBHOOK_TOKEN:
         logger.warning(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
         return jsonify({"error": "incorrect token"})
 
