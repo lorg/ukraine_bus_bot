@@ -94,11 +94,7 @@ class Bot:
     def handle_single_blast_message(self, blast_id: str, phone: str, text_to_send: str):
         # ? Better switch to `phonenumbers` library
         e164_phone = utils.clean_phone(phone)
-        if not self.whatsapp_messaging_session.is_phone_number_exists(e164_phone):
-          self.google_sheets.report_log(self.env.SOURCE_NUMBER, e164_phone, text_to_send, "not_a_whatsapp_phone", f"'{e164_phone} is not a whatsapp phone number', {blast_id}")
-          return
-
-        self.whatsapp_messaging_session.send_message(utils.clean_phone(phone), text_to_send)
+        self.whatsapp_messaging_session.send_message(e164_phone, text_to_send)
         self.google_sheets.report_log(self.env.SOURCE_NUMBER, e164_phone, text_to_send, "text_sent", f"Text 0 was sent to '{e164_phone}', {blast_id}")
 
     def handle_blast_request(self):
