@@ -91,6 +91,9 @@ class Bot:
         self.whatsapp_messaging_session.flush_messages()
         # self.sms_messaging_session.flush_messages()
 
+    def handle_webhook_notification(self, phone, text_to_send, status_code, status_text):
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, text_to_send, status_code, status_text)
+
     def handle_blast_request(self):
         phones = [line[0] for line in self.google_sheets.read_sheet()]
         text_to_send = phones[0]
