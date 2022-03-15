@@ -32,7 +32,7 @@ def blast(webhook_token):
     env = get_env()
     start_rookout(env)
     if webhook_token != env.WEBHOOK_TOKEN:
-        print(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
+        logger.warning(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
         return jsonify({"error": "incorrect token"})
     with start_bot() as bot:
         bot.handle_blast_request()
@@ -69,6 +69,53 @@ def timeout(timeout_params) -> Response:
 
     return jsonify({})
 
+@app.route('/whatsapp_response/<string:webhook_token>', methods=['POST'])
+@catch_exceptions_flask
+@with_profiler
+def whatsapp_response(webhook_token) -> Response:
+    env = get_env()
+    start_rookout(env)
+    if webhook_token != env.WEBHOOK_TOKEN:
+        logger.warning(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
+        return jsonify({"error": "incorrect token"})
+
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "no json"})
+
+    if isinstance(data, dict):
+        data = [data]
+
+    if not isinstance(data, list):
+        return jsonify({"error": "invalid json"})
+
+    with start_bot() as bot:
+        for message in data:
+            '''
+            event_type is one of:
+              'message:in:new'
+              'message:out:new'
+              'message:out:sent'
+              'message:out:ack'
+              'message:out:failed'
+            '''
+            event_type = message.get('event')
+
+            data = message.get('data', {})
+
+            if event_type == 'message:out:failed':
+                event_type += data.get('failureReason')
+
+            phone = data.get('phone')
+            text_to_send = data.get('message')
+
+            status_text = message.get('message')
+
+            with start_bot() as bot:
+                bot.handle_webhook_notification(phone, text_to_send, event_type, status_text)
+
+    return jsonify({})
 
 @app.errorhandler(404)
 def resource_not_found(e):
