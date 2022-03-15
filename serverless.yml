@@ -57,7 +57,7 @@ provider:
 functions:
   api:
     handler: wsgi_handler.handler
-    timeout: 30
+    timeout: 60
     provisionedConcurrency: 1
     events:
       - httpApi: '*'
