@@ -1,0 +1,111 @@
+org: imrigoldberg
+app: ukraine-bus-bot
+service: ukraine-bus-bot
+
+frameworkVersion: '3'
+
+custom:
+  myStage: ${opt:stage, self:provider.stage}
+  blastsTableName: 'ukraine-bus-bot-blasts-${self:provider.stage}'
+  stepFunctionName: ukraine-bus-bot-callWithDelay-${self:custom.myStage}
+  wsgi:
+    app: app.app
+
+package:
+  exclude:
+    - .venv/**
+    - .mypy_cache/**
+    - __pycache__/**
+    - .github/**
+    - .pytest_cache/**
+    - .vscode/**
+    - node_modules/**
+
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: opt:stage
+  memorySize: 256
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - Fn::GetAtt: [ BlastsTable, Arn ]
+        - Effect: Allow
+          Action:
+            - states:StartExecution
+          Resource:
+            - !Sub 'arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${self:custom.stepFunctionName}'
+  environment:
+    ENV_NAME: ${self:custom.myStage}
+    WEBHOOK_TOKEN: ${param:WEBHOOK_TOKEN, ''}
+    WASSENGER_API_KEY: ${param:WASSENGER_API_KEY, ''}
+    SOURCE_NUMBER: ${param:SOURCE_NUMBER, ''}
+    SOURCE_DEVICE: ${param:SOURCE_DEVICE, ''}
+    BLASTS_TABLE: ${self:custom.blastsTableName}
+
+functions:
+  api:
+    handler: wsgi_handler.handler
+    timeout: 30
+    provisionedConcurrency: 1
+    events:
+      - httpApi: '*'
+
+# stepFunctions:
+#   stateMachines:
+#     callWithDelay:
+#       name: ${self:custom.stepFunctionName}
+#       definition:
+#         Comment: "A step function that calls our lambda with delay"
+#         StartAt: waitState
+#         States:
+#           waitState:
+#             Type: Wait
+#             SecondsPath: $.WAIT_TIME
+#             Next: callLambda
+#           callLambda:
+#             Type: Task
+#             Resource:
+#               Fn::GetAtt: [api, Arn]
+#             InputPath: $
+#             End: true
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+  - serverless-step-functions
+resources:
+  # Outputs:
+  #   CallWithDelay:
+  #     Description: The ARN of this step function
+  #     Value:
+  #       Ref: CallWithDelayDash${self:custom.myStage}
+  Resources:
+    BlastsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: blast_id
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: blast_id
+            KeyType: HASH
+          - AttributeName: status
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.blastsTableName}
