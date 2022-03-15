@@ -6,7 +6,7 @@ frameworkVersion: '3'
 
 custom:
   myStage: ${opt:stage, self:provider.stage}
-  blastsTableName: 'ukraine-bus-bot-blasts-${self:provider.stage}'
+  blastsTableName: 'ukraine-bus-bot-blasts-${self:custom.myStage}'
   stepFunctionName: ukraine-bus-bot-callWithDelay-${self:custom.myStage}
   wsgi:
     app: app.app
