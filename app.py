@@ -32,7 +32,7 @@ def blast(webhook_token):
     env = get_env()
     start_rookout(env)
     if webhook_token != env.WEBHOOK_TOKEN:
-        print(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
+        logger.warning(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
         return jsonify({"error": "incorrect token"})
     with start_bot() as bot:
         bot.handle_blast_request()
@@ -76,7 +76,7 @@ def whatsapp_response(webhook_token) -> Response:
     env = get_env()
     start_rookout(env)
     if webhook_token != env.WASSENGER_WEBHOOK_TOKEN:
-        print(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
+        logger.warning(f"webhook token: received: {webhook_token} != expected: {env.WEBHOOK_TOKEN}")
         return jsonify({"error": "incorrect token"})
 
     data = request.json
