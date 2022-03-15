@@ -14,6 +14,7 @@ from environment import Environment
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+WASSENGER_NUMBER_EXISTS_URL = 'https://api.wassenger.com/v1/numbers/exists'
 WASSENGER_MESSAGES_URL = "https://api.wassenger.com/v1/messages"
 WASSENGER_GROUP_URL = 'https://api.wassenger.com/v1/devices/{device_id}/groups'
 WASSENGER_GET_GROUP_URL = 'https://api.wassenger.com/v1/devices/{device_id}/groups/{group_id}'
@@ -121,6 +122,22 @@ class WassengerSession(MessagingSession):
             "Content-Type": "application/json",
             "Token": self.env.WASSENGER_API_KEY
         })
+
+    # Should not be called more than 60 times per minute !
+    def is_phone_number_exists(self, phone: str):
+        try:
+            response = self.session.post(url=WASSENGER_NUMBER_EXISTS_URL, json={ 'phone': phone })
+            if response.status_code != 200 and response.status_code != 201:
+                logger.info("status code: %s, response content: %s", response.status_code, response.content)
+                return False
+
+            return True
+        except Exception as exc:
+            logger.exception(
+                "Unable to check phone number %s",
+                phone,
+                str(exc.__class__))
+            return False
 
     def send_group_message(self, group: str, message: str):
         source_device = self.env.SOURCE_DEVICE
@@ -280,6 +297,9 @@ class MockWassengerSession(WassengerSession):
     def __init__(self, queue_messages: bool = True, environment=Environment()):
         super().__init__(queue_messages, environment)
         self.next_group_id = 0
+
+    def is_phone_number_exists(self, phone: str):
+        return phone.startswith('+')
 
     def print_messages(self):
         for message in self.sent_messages:
