@@ -52,7 +52,7 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
           Resource:
-            - Fn::GetAtt: [ BlastsPhoneTable, Arn ]
+            - Fn::GetAtt: [ BlastPhonesTable, Arn ]
         - Effect: Allow
           Action:
             - states:StartExecution
@@ -65,6 +65,7 @@ provider:
     SOURCE_NUMBER: ${param:SOURCE_NUMBER, ''}
     SOURCE_DEVICE: ${param:SOURCE_DEVICE, ''}
     TEST_NUMBER: ${param:TEST_NUMBER, ''}
+    GOOGLE_SHEETS_LOG_URL: ${param:GOOGLE_SHEETS_LOG_URL, ''}
     BLASTS_TABLE: ${self:custom.blastsTableName}
     BLAST_PHONES_TABLE: ${self:custom.blastPhonesTableName}
 

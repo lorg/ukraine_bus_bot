@@ -30,6 +30,7 @@ import db
 
 import messaging
 from environment import Environment
+import google_sheets
 from texts_infra import Text, DEFAULT_LANGUAGE_CODE, UserInput, ParseResult
 from texts import Prompts, Inputs, SpecialInputTexts
 
@@ -76,11 +77,13 @@ class Bot:
 
         self.whatsapp_messaging_session: messaging.WassengerSession = whatsapp_messaging_session
         self.sms_messaging_session: messaging.MessagingSession = sms_messaging_session
+        self.google_sheets = google_sheets.GoogleSheets(self.env)
 
         self.global_feature_flags = GlobalFeatureFlags()
 
     def handle_blast_request(self):
         self.whatsapp_messaging_session.send_message(self.env.TEST_NUMBER, "hello world")
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, self.env.TEST_NUMBER, "hello world", "blast", "having a blast")
 
     # def _load_global_feature_flags(self):
     #     persistents_data = self.persistents_table.get_first(name=GLOBAL_FEATURE_FLAGS_PERSISTENT_NAME)

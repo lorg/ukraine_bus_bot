@@ -36,6 +36,8 @@ class Environment:
         self.ADMIN_MESSAGES_SOURCE_DEVICE = os.environ.get(
             'ADMIN_MESSAGES_SOURCE_DEVICE', '')
 
+        self.GOOGLE_SHEETS_LOG_URL = os.environ.get('GOOGLE_SHEETS_LOG_URL', '')
+
         # self.SENTRY_DSN = os.environ.get('SENTRY_DSN', '').strip()
 
         # self.APIGATEWAY_URL = os.environ.get('APIGATEWAY_URL', '').strip()
