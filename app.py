@@ -108,7 +108,8 @@ def whatsapp_response(webhook_token) -> Response:
             if event_type == 'message:out:failed':
                 event_type += data.get('failureReason')
 
-            phone = data.get('phone')
+            to_phone = data.get('phone')
+            from_phone = None
             text_to_send = data.get('message')
 
             if event_type == 'message:in:new':
@@ -116,11 +117,12 @@ def whatsapp_response(webhook_token) -> Response:
                 if not status_text:
                     status_text = ''
                 status_text = status_text.strip()
+                from_phone = data.get('fromNumber')
             else:
                 status_text = message.get('message')
 
             with start_bot() as bot:
-                bot.handle_webhook_notification(phone, text_to_send, event_type, status_text)
+                bot.handle_webhook_notification(to_phone, text_to_send, event_type, status_text, from_phone=from_phone)
 
     return jsonify({})
 
