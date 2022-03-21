@@ -69,6 +69,7 @@ def timeout(timeout_params) -> Response:
 
     return jsonify({})
 
+
 @app.route('/whatsapp_response/<string:webhook_token>', methods=['POST'])
 @catch_exceptions_flask
 @with_profiler
@@ -110,12 +111,19 @@ def whatsapp_response(webhook_token) -> Response:
             phone = data.get('phone')
             text_to_send = data.get('message')
 
-            status_text = message.get('message')
+            if event_type == 'message:in:new':
+                status_text = data.get('body', '')
+                if not status_text:
+                    status_text = ''
+                status_text = status_text.strip()
+            else:
+                status_text = message.get('message')
 
             with start_bot() as bot:
                 bot.handle_webhook_notification(phone, text_to_send, event_type, status_text)
 
     return jsonify({})
+
 
 @app.errorhandler(404)
 def resource_not_found(e):
