@@ -114,8 +114,12 @@ class Bot:
             text_to_send=text_to_send)
         self.blasts_table.put(blast)
 
+        seen = set()
         with self.blast_phones_table.batch_writer() as batch:
             for i, (phone, clean_phone) in enumerate(phones):
+                if clean_phone in seen:
+                    continue
+                seen.add(clean_phone)
                 batch.put(models.BlastPhone(
                     blast_id=blast.blast_id,
                     phone=phone,

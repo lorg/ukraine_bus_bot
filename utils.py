@@ -475,3 +475,13 @@ def split_message_by_max_len(message: str, max_len: int, split_by: Optional[str]
             else:
                 result_messages[-1] += line
     return result_messages
+
+def unique(lst):
+    seen = set()
+    result = []
+    for item in lst:
+        if item in seen:
+            continue
+        seen.add(item)
+        result.append(item)
+    return result
