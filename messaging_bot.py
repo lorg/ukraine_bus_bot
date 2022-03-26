@@ -103,6 +103,14 @@ class Bot:
 
         phones = [(p, utils.clean_phone(p)) for p in phones]
         phones = [(p, clean_p) for p, clean_p in phones if clean_p]
+        seen = set()
+        unique_phones = []
+        for phone, clean_phone in phones:
+            if clean_phone in seen:
+                continue
+            seen.add(clean_phone)
+            unique_phones.append((phone, clean_phone))
+        phones = unique_phones
 
         blast = models.Blast(
             blast_id=utils.get_uid(),
@@ -114,12 +122,8 @@ class Bot:
             text_to_send=text_to_send)
         self.blasts_table.put(blast)
 
-        seen = set()
         with self.blast_phones_table.batch_writer() as batch:
             for i, (phone, clean_phone) in enumerate(phones):
-                if clean_phone in seen:
-                    continue
-                seen.add(clean_phone)
                 batch.put(models.BlastPhone(
                     blast_id=blast.blast_id,
                     phone=phone,
