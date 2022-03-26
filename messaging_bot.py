@@ -97,9 +97,9 @@ class Bot:
         self.google_sheets.report_log(from_phone, to_phone, text_to_send, status_code, status_text)
 
     def handle_blast_request(self):
-        phones = [line[0] for line in self.google_sheets.read_sheet()]
-        text_to_send = phones[0]
-        phones = phones[1:]
+        sheet = self.google_sheets.read_sheet()
+        text_to_send = sheet[0][0]
+        phones = [line[0] for line in sheet[1:] if line]
 
         phones = [(p, utils.clean_phone(p)) for p in phones]
         phones = [(p, clean_p) for p, clean_p in phones if clean_p]
