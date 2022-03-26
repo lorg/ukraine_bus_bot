@@ -50,4 +50,5 @@ class Blast(BaseModel):
 class BlastPhone(BaseModel):
     blast_id: str
     phone: str
+    clean_phone: str
     phone_idx: str

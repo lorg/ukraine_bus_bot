@@ -100,6 +100,10 @@ class Bot:
         phones = [line[0] for line in self.google_sheets.read_sheet()]
         text_to_send = phones[0]
         phones = phones[1:]
+
+        phones = [(p, utils.clean_phone(p)) for p in phones]
+        phones = [(p, clean_p) for p, clean_p in phones if clean_p]
+
         blast = models.Blast(
             blast_id=utils.get_uid(),
             status=models.BlastStatus.IN_PROGRESS,
@@ -109,19 +113,18 @@ class Bot:
             ended_timestamp="",
             text_to_send=text_to_send)
         self.blasts_table.put(blast)
-        phones = [utils.clean_phone(p) for p in phones]
-        phones = [p for p in phones if p]
 
         with self.blast_phones_table.batch_writer() as batch:
-            for i, phone in enumerate(phones):
+            for i, (phone, clean_phone) in enumerate(phones):
                 batch.put(models.BlastPhone(
                     blast_id=blast.blast_id,
                     phone=phone,
+                    clean_phone=clean_phone,
                     phone_idx=str(i)))
 
-        phone = phones[0]
-        self.whatsapp_messaging_session.send_message(phone, blast.text_to_send)
-        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "text_sent", f"Text 0 was sent to '{phone}', {blast.blast_id}")
+        phone, clean_phone = phones[0]
+        self.whatsapp_messaging_session.send_message(clean_phone, blast.text_to_send)
+        self.google_sheets.report_log(self.env.SOURCE_NUMBER, phone, blast.text_to_send, "text_sent", f"Text 0 was sent to '{clean_phone}', {blast.blast_id}")
         self.call_timeout_with_params(dict(
             blast_id=blast.blast_id,
             method=defs.TimeoutMethod.ITERATE_BLAST,
