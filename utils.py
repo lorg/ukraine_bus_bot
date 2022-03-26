@@ -429,14 +429,12 @@ def clean_for_json(d: Any):
 
 
 def clean_phone(phone):
-    phone = phone.replace('-', '').replace(' ', '')
-    if phone.startswith('05'):
-        return '+972' + phone[1:]
-    if phone.startswith('5'):
-        return '+972' + phone
+    phone = phone.replace('-', '').replace(' ', '').replace('(', '').replace(')', '').replace('=', '')
+    phone = phone.strip()
+    if not phone:
+        return ''
     if not phone.startswith('+'):
         return '+' + phone
-
     return phone
 
 
